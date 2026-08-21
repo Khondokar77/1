@@ -1,0 +1,105 @@
+/* ==========================================================================
+   board.css — betting layout, in DESIGN pixels (720-wide stage)
+
+   The table occupies 508 x 346 at x=88 — widened from the reference's 454
+   so the number cells read properly on a phone. It is built from 14 tracks:
+
+     track 1       "0", spanning rows 1-3            56 px
+     tracks 2-13   twelve 1fr units                 ~27.6 px each
+                     numbers            span 3  ->  ~89 px  (4 per row)
+                     1-6 / 4-9 / 7-12   span 4  -> ~119 px  (3 across)
+                     EVEN ◆ ◆ ODD       span 3  ->  ~89 px  (4 across)
+     track 14      the three "2to1" row bets         82 px
+
+   Five rows of ~67 px with 3 px gutters = 346 px. The tighter gutter is
+   closer to the reference, where the cream borders very nearly touch.
+   ========================================================================== */
+
+#board{
+  position:absolute;left:88px;width:508px;bottom:138px;height:346px;
+  display:grid;
+  grid-template-columns:56px repeat(12,1fr) 82px;
+  grid-template-rows:repeat(5,1fr);
+  gap:3px;
+}
+
+.cell{
+  position:relative;
+  display:grid;place-items:center;
+  border:3px solid rgba(247,242,227,.9);
+  border-radius:6px;
+  font-family:var(--font-board);
+  font-weight:700;
+  color:var(--cream);
+  background:rgba(0,0,0,.18);
+  box-shadow:0 2px 5px rgba(0,0,0,.32);
+  transition:transform .1s ease, filter .18s ease, box-shadow .18s ease;
+}
+.cell:active{transform:scale(.93);filter:brightness(1.25);}
+
+.cell.num  {font-size:54px;}
+.cell.red  {background:linear-gradient(180deg,#e1242f,#a3121c);}
+.cell.black{background:linear-gradient(180deg,#26292d,#0a0c0f);}
+
+.cell.zero{
+  grid-column:1;grid-row:1 / span 3;
+  background:linear-gradient(180deg,#22b673,#057c46);
+  border-radius:38px 6px 6px 38px;
+  font-size:56px;
+}
+
+.cell.side{                        /* 2to1 */
+  grid-column:14;
+  font-size:28px;
+  background:rgba(0,0,0,.22);
+}
+
+.cell.dozen{grid-row:4;font-size:42px;}
+.cell.even {grid-row:5;font-size:31px;letter-spacing:.01em;}
+
+/* red / black diamonds */
+.dia{
+  width:46px;height:46px;
+  transform:rotate(45deg);
+  border-radius:5px;
+  border:3px solid rgba(247,242,227,.92);
+}
+.dia.r{background:linear-gradient(180deg,#e1242f,#a3121c);}
+.dia.b{background:linear-gradient(180deg,#26292d,#07090b);}
+
+/* winning-zone highlight */
+.cell.hot{
+  box-shadow:0 0 0 4px var(--gold), 0 0 28px 6px rgba(246,207,110,.55);
+  animation:hotPulse .65s ease-in-out 3;
+}
+@keyframes hotPulse{50%{filter:brightness(1.4)}}
+
+/* ------------------------------- CHIPS ---------------------------------- */
+.chip{
+  position:absolute;left:50%;top:50%;
+  width:54px;height:54px;
+  transform:translate(-50%,-50%);
+  border-radius:50%;
+  display:grid;place-items:center;
+  font-family:var(--font-ui);
+  font-size:18px;font-weight:900;color:#fff;
+  text-shadow:0 1px 3px rgba(0,0,0,.8);
+  pointer-events:none;z-index:3;
+  box-shadow:
+    0 3px 0 rgba(0,0,0,.45),
+    0 8px 14px rgba(0,0,0,.45),
+    inset 0 -5px 8px rgba(0,0,0,.4),
+    inset 0 3px 5px rgba(255,255,255,.45);
+  animation:chipDrop .26s var(--ease-pop);
+}
+.chip .ring{
+  position:absolute;inset:4px;border-radius:50%;
+  border:3px dashed rgba(255,255,255,.8);opacity:.85;
+}
+.chip .v{position:relative;z-index:1;}
+@keyframes chipDrop{
+  from{transform:translate(-50%,-190%) scale(.55);opacity:0}
+  to  {transform:translate(-50%,-50%) scale(1);opacity:1}
+}
+.chip.win{animation:chipWin .5s ease-in-out 3;}
+@keyframes chipWin{50%{transform:translate(-50%,-50%) scale(1.22)}}

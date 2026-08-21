@@ -1,0 +1,126 @@
+/* ==========================================================================
+   effects.css — overlays: tooltip, win callout, avatar, toast, rules sheet
+   ========================================================================== */
+
+#fxCv{position:fixed;inset:0;z-index:20;pointer-events:none;}
+
+/* --------------------------- BET TOOLTIP -------------------------------- */
+#tip{
+  position:fixed;z-index:22;pointer-events:none;
+  left:0;top:0;
+  transform:translate(-50%,-120%) scale(.82);
+  opacity:0;
+  padding:7px 12px;border-radius:var(--r-md);
+  background:var(--glass);
+  border:1px solid var(--glass-line);
+  backdrop-filter:blur(14px) saturate(1.5);
+  -webkit-backdrop-filter:blur(14px) saturate(1.5);
+  box-shadow:0 10px 24px rgba(0,0,0,.45);
+  font-size:10.5px;font-weight:800;letter-spacing:.05em;
+  white-space:nowrap;color:var(--cream);
+  transition:opacity .18s ease, transform .26s var(--ease-pop);
+}
+#tip.on{opacity:1;transform:translate(-50%,-140%) scale(1);}
+
+/* --------------------------- WIN CALLOUT -------------------------------- */
+#callout{
+  position:absolute;left:50%;top:50%;z-index:21;
+  pointer-events:none;text-align:center;line-height:1;
+  transform:translate(-50%,-50%) scale(.4);opacity:0;
+}
+#callout .big{
+  display:block;
+  font-family:var(--font-board);font-weight:700;
+  font-size:100px;letter-spacing:-.01em;
+  background:linear-gradient(180deg,#fff8de,var(--gold) 46%,var(--gold-mid));
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 5px 0 rgba(0,0,0,.5)) drop-shadow(0 14px 26px rgba(0,0,0,.5));
+}
+#callout .amt{
+  display:block;margin-top:12px;
+  font-size:40px;font-weight:900;color:var(--cream);
+  text-shadow:0 3px 10px rgba(0,0,0,.75);
+}
+#callout.show{animation:calloutIn 1.9s var(--ease-cam) forwards;}
+@keyframes calloutIn{
+  0%  {opacity:0;transform:translate(-50%,-50%) scale(.4)}
+  18% {opacity:1;transform:translate(-50%,-50%) scale(1.12)}
+  28% {transform:translate(-50%,-50%) scale(1)}
+  76% {opacity:1;transform:translate(-50%,-58%) scale(1)}
+  100%{opacity:0;transform:translate(-50%,-80%) scale(.9)}
+}
+
+/* ----------------------------- AVATAR ----------------------------------- */
+#avatar{
+  position:fixed;z-index:23;left:0;top:0;
+  pointer-events:none;opacity:0;
+  transform:translate(-50%,-100%) scale(.4);
+}
+#avatar.show{animation:avaIn 2s var(--ease-cam) forwards;}
+@keyframes avaIn{
+  0%  {opacity:0;transform:translate(-50%,-60%) scale(.3)}
+  16% {opacity:1;transform:translate(-50%,-120%) scale(1.1)}
+  26% {transform:translate(-50%,-110%) scale(1)}
+  80% {opacity:1;transform:translate(-50%,-116%) scale(1)}
+  100%{opacity:0;transform:translate(-50%,-152%) scale(.85)}
+}
+
+/* ------------------------------ TOAST ----------------------------------- */
+#toast{
+  position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 104px);
+  z-index:24;pointer-events:none;
+  transform:translate(-50%,10px);opacity:0;
+  padding:8px 16px;border-radius:var(--r-pill);
+  background:rgba(0,0,0,.76);
+  border:1px solid rgba(255,255,255,.18);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  font-size:12px;font-weight:800;color:var(--cream);
+  transition:opacity .2s ease, transform .2s ease;
+}
+#toast.on{opacity:1;transform:translate(-50%,0);}
+
+/* --------------------------- RULES SHEET -------------------------------- */
+#sheet{
+  position:fixed;inset:0;z-index:30;
+  display:grid;place-items:center;
+  padding:20px;
+  background:rgba(0,0,0,.6);
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  animation:fadeIn .2s ease;
+}
+#sheet[hidden]{display:none;}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+.sheetCard{
+  width:100%;max-width:340px;
+  padding:20px;border-radius:var(--r-lg);
+  background:linear-gradient(180deg,rgba(26,120,78,.95),rgba(5,60,35,.97));
+  border:1px solid var(--glass-line);
+  box-shadow:0 20px 50px rgba(0,0,0,.6);
+  animation:sheetIn .3s var(--ease-pop);
+}
+@keyframes sheetIn{from{transform:translateY(20px) scale(.94);opacity:0}to{transform:none;opacity:1}}
+
+.sheetCard h2{
+  margin:0 0 14px;font-family:var(--font-board);font-size:20px;font-weight:700;
+  color:var(--gold);letter-spacing:.02em;
+}
+.sheetCard ul{list-style:none;margin:0 0 14px;padding:0;display:grid;gap:8px;}
+.sheetCard li{
+  display:flex;justify-content:space-between;gap:12px;
+  font-size:13px;font-weight:700;
+  padding-bottom:7px;border-bottom:1px solid rgba(255,255,255,.12);
+}
+.sheetCard li b{color:var(--gold);white-space:nowrap;}
+.sheetCard li.note{border-bottom:0;color:#9ee7bd;}
+.sheetCard .rtp{margin:0 0 16px;font-size:11px;line-height:1.5;color:var(--cream-dim);}
+#sheetClose{
+  width:100%;height:44px;border-radius:var(--r-pill);
+  background:linear-gradient(180deg,#3fcb86,#0d7d4c);
+  color:#042a17;font-size:14px;font-weight:900;letter-spacing:.1em;
+  box-shadow:0 4px 0 rgba(3,52,31,.9), inset 0 2px 0 rgba(255,255,255,.45);
+}
+
+@media (prefers-reduced-motion:reduce){
+  #callout.show,#avatar.show,.chip,.chip.win,.cell.hot,.hchip,.sheetCard{animation-duration:1ms;}
+}

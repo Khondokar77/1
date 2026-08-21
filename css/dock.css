@@ -1,0 +1,128 @@
+/* ==========================================================================
+   dock.css — action stack + chip carousel, in DESIGN pixels
+
+   Reference offsets, measured from the bottom edge of the stage:
+     repeat right 38, bottom 252, 62 x 62
+     x2    right 38, bottom 158, 62 x 62
+     spin  right 26, bottom  18, 110 x 110
+     rail  left  50, bottom  12, 460 x 86
+
+   Shifted outward from the reference offsets to clear the widened board.
+   ========================================================================== */
+
+/* ---------------------------- ACTION STACK ------------------------------ */
+.act{
+  position:absolute;right:38px;
+  width:62px;height:62px;border-radius:50%;
+  display:grid;place-items:center;
+  color:#d7f5e5;
+  border:2px solid rgba(190,255,220,.42);
+  background:linear-gradient(180deg,rgba(72,180,130,.42),rgba(6,72,44,.62));
+  box-shadow:var(--sh-lift), inset 0 2px 0 rgba(255,255,255,.32);
+  transition:transform .13s ease, filter .18s ease, opacity .2s ease;
+}
+.act i, .act svg{display:grid;place-items:center;width:32px;height:32px;stroke-width:2.2;}
+.act svg{width:32px;height:32px;}
+.act:active{transform:scale(.9);filter:brightness(1.25);}
+.act:disabled{opacity:.34;pointer-events:none;}
+
+#repeatBtn{bottom:252px;}
+#dblBtn {bottom:158px;}
+
+.act .x2{
+  position:absolute;right:7px;bottom:5px;
+  font-size:15px;font-weight:900;letter-spacing:-.02em;
+  color:var(--cream);text-shadow:0 1px 3px rgba(0,0,0,.7);
+}
+
+#spinBtn{
+  position:absolute;right:26px;bottom:18px;
+  width:110px;height:110px;border-radius:50%;
+  display:grid;place-items:center;
+  color:#eafff3;
+  border:3px solid rgba(200,255,225,.5);
+  background:
+    radial-gradient(70% 70% at 34% 26%, rgba(255,255,255,.32), rgba(255,255,255,0) 62%),
+    linear-gradient(180deg,#3fcb86,#0d7d4c);
+  background-color:#0f8a52;
+  box-shadow:0 8px 0 rgba(3,52,31,.9), 0 18px 30px rgba(0,0,0,.45),
+             inset 0 3px 0 rgba(255,255,255,.42);
+  transition:transform .12s ease, filter .2s ease, box-shadow .12s ease;
+}
+#spinBtn i, #spinBtn svg{display:grid;place-items:center;width:54px;height:54px;stroke-width:2.1;}
+#spinBtn svg{width:54px;height:54px;}
+#spinBtn:active{
+  transform:translateY(6px);
+  box-shadow:0 2px 0 rgba(3,52,31,.9), 0 8px 14px rgba(0,0,0,.4),
+             inset 0 3px 0 rgba(255,255,255,.4);
+}
+#spinBtn:disabled{filter:grayscale(.6) brightness(.74);pointer-events:none;}
+/* Ready pulse. Animating box-shadow forces a repaint on every frame, which
+   competes with the wheel for main-thread time; a pseudo-element animated on
+   transform + opacity alone stays on the compositor. */
+#spinBtn::after{
+  content:"";position:absolute;inset:-6px;border-radius:50%;
+  border:4px solid rgba(246,207,110,.55);
+  opacity:0;pointer-events:none;
+}
+#spinBtn.ready::after{animation:spinReady 2.2s ease-in-out infinite;}
+@keyframes spinReady{
+  0%,100%{opacity:0;transform:scale(.94)}
+  50%    {opacity:1;transform:scale(1.06)}
+}
+
+/* --------------------------- CHIP CAROUSEL ------------------------------ */
+#rail{
+  position:absolute;left:50px;bottom:12px;width:460px;height:86px;
+  display:flex;align-items:center;gap:6px;
+}
+
+.railArrow{
+  flex:0 0 auto;width:34px;height:70px;
+  color:var(--cream-dim);
+  display:grid;place-items:center;
+  transition:color .15s ease, transform .12s ease, opacity .2s ease;
+}
+.railArrow i, .railArrow svg{display:grid;place-items:center;width:32px;height:32px;stroke-width:2.6;}
+.railArrow svg{width:32px;height:32px;}
+.railArrow:active{transform:scale(.85);color:var(--cream);}
+.railArrow:disabled{opacity:.22;pointer-events:none;}
+
+#chipRail{
+  flex:1 1 auto;height:86px;
+  display:flex;gap:14px;align-items:center;
+  padding:12px 14px;
+  overflow-x:auto;
+  scroll-behavior:smooth;
+  scrollbar-width:none;
+  border-radius:999px;
+  background:linear-gradient(180deg,rgba(0,0,0,.64),rgba(0,0,0,.8));
+  border:2px solid rgba(255,255,255,.12);
+  box-shadow:inset 0 3px 9px rgba(0,0,0,.65), 0 6px 16px rgba(0,0,0,.3);
+}
+#chipRail::-webkit-scrollbar{display:none;}
+
+.chipBtn{
+  position:relative;flex:0 0 auto;
+  width:62px;height:62px;border-radius:50%;
+  display:grid;place-items:center;
+  font-size:20px;font-weight:900;color:#fff;
+  text-shadow:0 2px 3px rgba(0,0,0,.75);
+  box-shadow:
+    0 4px 0 rgba(0,0,0,.5),
+    0 9px 15px rgba(0,0,0,.45),
+    inset 0 -6px 9px rgba(0,0,0,.38),
+    inset 0 4px 6px rgba(255,255,255,.45);
+  transition:transform .16s var(--ease-pop), filter .16s ease;
+}
+.chipBtn .ring{
+  position:absolute;inset:4px;border-radius:50%;
+  border:4px dashed rgba(255,255,255,.85);
+}
+.chipBtn .v{position:relative;z-index:1;}
+.chipBtn.sel{transform:translateY(-8px) scale(1.08);filter:brightness(1.12);}
+.chipBtn.sel::after{
+  content:"";position:absolute;inset:-6px;border-radius:50%;
+  border:3px solid var(--gold);
+  box-shadow:0 0 18px rgba(246,207,110,.85);
+}

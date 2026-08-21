@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0a5c33">
+<meta name="description" content="Mini Roulette — 13-pocket HTML5 casino game template.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Mini Roulette</title>
+
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/board.css">
+<link rel="stylesheet" href="css/dock.css">
+<link rel="stylesheet" href="css/effects.css">
+
+<!-- Lucide icons (UMD). Loaded with defer; js/icons.js falls back to inline
+     SVG if the CDN is unavailable, so buttons are never blank. -->
+<script defer src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+
+<!-- The felt fills the device. #app is a fixed 720-wide design stage that is
+     scaled to fit, so every component keeps its exact designed size on every
+     phone — the layout can never reflow or overflow. -->
+<div id="viewport">
+  <div id="app">
+
+    <!-- ========================== HEADER ========================== -->
+    <div id="hist"></div>
+
+    <button id="menuBtn" type="button" aria-label="Game rules">
+      <i data-lucide="menu"></i>
+    </button>
+
+    <p id="zeroPays">ZERO ALWAYS PAYS</p>
+
+    <div id="limits">
+      <span>MIN $0.25</span>
+      <span>MAX $500</span>
+    </div>
+
+    <div id="logo" aria-hidden="true">
+      <span class="l-mini">Mini</span>
+      <span class="l-roul">ROULETTE<em></em></span>
+    </div>
+
+    <!-- =========================== WHEEL ========================== -->
+    <section id="wheelStage">
+      <div id="wheelBox">
+        <div id="wheelShadow"></div>
+        <canvas id="wheelStatic"></canvas>
+        <canvas id="wheelCv"></canvas>
+        <!-- Only shown once a result lands; before that the canvas turret
+             cross is visible underneath, as in the reference. -->
+        <div id="hub"><span id="hubNum"></span></div>
+      </div>
+      <div id="callout">
+        <span class="big">You win!</span>
+        <span class="amt"></span>
+      </div>
+    </section>
+
+    <!-- ====================== BOARD + CONTROLS ==================== -->
+    <section id="bottom">
+
+      <div id="meters">
+        <span>BALANCE <b id="balTxt">$1,000.00</b></span>
+        <span class="sep">·</span>
+        <span>BET <b id="betTxt">$0.00</b></span>
+      </div>
+
+      <div id="board" role="group" aria-label="Betting layout"></div>
+
+      <button class="act" id="repeatBtn" type="button"
+              aria-label="Repeat last bet (hold to undo)">
+        <i data-lucide="rotate-ccw"></i>
+      </button>
+
+      <button class="act" id="dblBtn" type="button" aria-label="Double all bets">
+        <i data-lucide="refresh-cw"></i>
+        <span class="x2">&#215;2</span>
+      </button>
+
+      <button id="spinBtn" type="button" aria-label="Spin">
+        <i data-lucide="coins"></i>
+      </button>
+
+      <div id="rail">
+        <button class="railArrow" id="railPrev" type="button" aria-label="Previous chips"><i data-lucide="chevron-left"></i></button>
+        <div id="chipRail"></div>
+        <button class="railArrow" id="railNext" type="button" aria-label="More chips"><i data-lucide="chevron-right"></i></button>
+      </div>
+
+    </section>
+  </div>
+</div>
+
+<!-- ===== overlays live outside the scaled stage, in real screen pixels ==== -->
+<canvas id="fxCv" aria-hidden="true"></canvas>
+<div id="tip" role="status"></div>
+<div id="avatar" aria-hidden="true"></div>
+<div id="toast" role="status"></div>
+
+<div id="sheet" hidden>
+  <div class="sheetCard">
+    <h2>Payouts</h2>
+    <ul>
+      <li><span>Straight number</span><b>11 : 1</b></li>
+      <li><span>Row (2to1)</span><b>2 : 1</b></li>
+      <li><span>1-6 / 4-9 / 7-12</span><b>1 : 1</b></li>
+      <li><span>Even / Odd / Red / Black</span><b>1 : 1</b></li>
+      <li class="note"><span>Zero always pays</span><b>half stake back</b></li>
+    </ul>
+    <p class="rtp">RTP 92.31% on straight &amp; row bets · 96.15% on even-money bets.</p>
+    <button id="sheetClose" type="button">Got it</button>
+  </div>
+</div>
+
+<!-- Classic scripts (no build step, runs straight from the file system). -->
+<script src="js/utils.js"></script>
+<script src="js/icons.js"></script>
+<script src="js/config.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/wheel.js"></script>
+<script src="js/physics.js"></script>
+<script src="js/camera.js"></script>
+<script src="js/fx.js"></script>
+<script src="js/bets.js"></script>
+<script src="js/board.js"></script>
+<script src="js/game.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,237 @@
+/* ==========================================================================
+   layout.css — the design stage
+
+   SCALING MODEL
+   -------------
+   Everything is authored on a fixed 720 x 1332 design stage, taken straight
+   off the reference artwork. main.js sets
+
+       --s = min(viewportWidth / 720, viewportHeight / 1332)
+
+   and scales #app by it. Consequences:
+
+     · every component keeps its exact designed size and position, on every
+       phone — the layout has no reflow path, so it cannot overflow
+     · the wheel is always 82.8% of the stage width, the board always 63.1%,
+       exactly as in the reference
+     · on taller devices the design stage simply grows below 1332 and the
+       extra room becomes felt: the header stays pinned to the top, the board
+       and controls stay pinned to the bottom, and the wheel centres in the
+       space between them
+
+   Every length in this file is a DESIGN pixel, not a device pixel.
+   ========================================================================== */
+
+#viewport{
+  position:fixed;inset:0;overflow:hidden;
+  background:
+    radial-gradient(112% 58% at 50% 34%, var(--felt-hi) 0%, var(--felt-mid) 44%, var(--felt-lo) 76%, var(--felt-edge) 100%),
+    var(--felt-lo);
+}
+/* Felt weave. Plain alpha, no mix-blend-mode: blending forces an extra
+   full-viewport compositing pass every time the wheel canvas repaints. */
+#viewport::after{
+  content:"";position:absolute;inset:0;pointer-events:none;z-index:1;
+  background-image:radial-gradient(rgba(0,0,0,.10) 1px, transparent 1.2px);
+  background-size:6px 6px;
+}
+
+#app{
+  position:absolute;left:50%;top:0;
+  width:720px;margin-left:-360px;
+  height:1332px;                      /* overwritten by main.js */
+  transform-origin:top center;
+  transform:scale(var(--s,.5));
+  z-index:2;
+}
+
+/* ------------------------------ HEADER ---------------------------------- */
+#hist{
+  position:absolute;left:177px;top:71px;width:366px;height:34px;
+  display:flex;align-items:center;gap:6px;
+  padding:0 10px;overflow:hidden;
+  border-radius:8px;
+  background:rgba(0,0,0,.74);
+  border:1px solid rgba(255,255,255,.13);
+  box-shadow:inset 0 3px 7px rgba(0,0,0,.7);
+}
+.hchip{
+  flex:0 0 auto;width:26px;height:26px;border-radius:5px;
+  display:grid;place-items:center;
+  font-size:15px;font-weight:800;color:#fff;
+  box-shadow:inset 0 -2px 3px rgba(0,0,0,.55);
+  animation:histIn .3s var(--ease-pop);
+}
+@keyframes histIn{from{transform:scale(.3);opacity:0}to{transform:scale(1);opacity:1}}
+.c-red{background:linear-gradient(180deg,#e23a46,var(--ruby-lo));}
+.c-black{background:linear-gradient(180deg,#333a41,#0a0d10);}
+.c-green{background:linear-gradient(180deg,#2fbe78,#046b3f);}
+
+#menuBtn{
+  position:absolute;right:40px;top:63px;width:75px;height:75px;
+  border-radius:50%;
+  display:grid;place-content:center;gap:7px;
+  border:2px solid rgba(255,255,255,.3);
+  background:linear-gradient(180deg,rgba(120,220,170,.36),rgba(10,90,55,.5));
+  box-shadow:var(--sh-lift), inset 0 2px 0 rgba(255,255,255,.38);
+}
+#menuBtn i{display:block;width:31px;height:4px;border-radius:3px;background:var(--cream);}
+
+#zeroPays{
+  position:absolute;left:0;right:0;top:110px;margin:0;
+  text-align:center;
+  font-size:24px;font-weight:800;letter-spacing:.06em;
+  color:var(--cream);
+  text-shadow:0 2px 3px rgba(0,0,0,.55);
+}
+
+#limits{
+  position:absolute;left:28px;top:148px;width:116px;height:74px;
+  display:grid;align-content:center;justify-items:center;gap:2px;
+  border-radius:10px;
+  border:2px solid rgba(255,255,255,.22);
+  background:linear-gradient(180deg,#8d5424,#48250f);
+  box-shadow:var(--sh-lift), inset 0 2px 0 rgba(255,255,255,.25);
+  font-size:21px;font-weight:800;letter-spacing:.01em;line-height:1.25;
+  white-space:nowrap;
+}
+
+#logo{
+  position:absolute;right:34px;top:138px;width:196px;
+  text-align:right;line-height:.9;pointer-events:none;
+}
+.l-mini{
+  display:block;
+  font-family:var(--font-board);font-style:italic;font-weight:700;
+  font-size:38px;color:var(--cream);
+  text-shadow:0 2px 0 var(--gold-dk), 0 4px 7px rgba(0,0,0,.6);
+  transform:rotate(-4deg) translateX(-30px);
+}
+.l-roul{
+  position:relative;display:block;margin-top:-4px;
+  font-family:var(--font-board);font-weight:700;
+  font-size:41px;letter-spacing:.01em;color:var(--cream);
+  text-shadow:0 3px 0 #6d3a14, 0 5px 9px rgba(0,0,0,.55);
+}
+.l-roul em{
+  position:absolute;right:4px;top:-24px;width:66px;height:21px;
+  border-radius:40px 40px 0 0;
+  background:linear-gradient(180deg,#f0303e,var(--ruby-lo));
+  transform:rotate(-8deg);
+}
+
+/* --------------------------- WHEEL STAGE -------------------------------- */
+/* Spans the gap between the header and the bottom cluster; the wheel is a
+   fixed 596 design px and simply centres in whatever room that leaves. */
+#wheelStage{
+  position:absolute;left:0;right:0;top:196px;bottom:528px;
+  display:grid;place-items:center;
+  transform-origin:50% 50%;
+  transition:transform var(--dur-cam) var(--ease-cam);
+  will-change:transform;
+}
+#wheelBox{position:relative;line-height:0;}
+/* No CSS filter here on purpose. filter:drop-shadow() on a canvas is
+   re-evaluated on EVERY frame because the canvas content changes, which was
+   costing more than the wheel draw itself. The shadow is baked into the
+   cached bitmap instead (see wheel.js). */
+/* Three stacked pieces, all centred on the same point:
+     #wheelShadow  a plain div carrying the drop shadow. It is STATIC — a
+                   directional shadow baked into the rotating bitmap orbits
+                   with it, which is what made the spinning disc look
+                   lopsided. As a DOM element it is composited once.
+     #wheelStatic  the bowl, rim, deflectors and ball track. Painted once.
+     #wheelCv      the rotor and the ball. Redrawn every frame.
+
+   The canvas box is 5% larger than the 596px wheel so the antialiased outer
+   edge is never clipped flat at the bitmap boundary — flat chords at the
+   edge stop a rotating disc from reading as circular. The extra is
+   transparent. Sizes are set by main.js; these are pre-layout defaults. */
+#wheelBox > *{
+  position:absolute;left:50%;top:50%;
+  transform:translate(-50%,-50%);
+}
+#wheelShadow{
+  width:596px;height:596px;border-radius:50%;
+  background:#2c1409;
+  box-shadow:0 24px 38px rgba(0,0,0,.5), 0 6px 14px rgba(0,0,0,.4);
+  z-index:0;
+}
+#wheelStatic{display:block;width:626px;height:626px;z-index:1;}
+#wheelCv{
+  display:block;width:626px;height:626px;z-index:2;
+  backface-visibility:hidden;
+}
+/* #wheelBox must still take up the canvas box, so one child stays in flow */
+#wheelBox{width:626px;height:626px;}
+
+/* The winning-number disc. Hidden until a result lands, so the metal turret
+   cross painted on the rotor shows through — that is the wheel's resting
+   state in the reference. 130px = 0.217R, measured off the reference. */
+#hub{
+  position:absolute;left:50%;top:50%;z-index:3;
+  width:130px;height:130px;
+  transform:translate(-50%,-50%) scale(.4);
+  border-radius:50%;
+  display:grid;place-items:center;
+  pointer-events:none;
+  opacity:0;visibility:hidden;
+  background:radial-gradient(62% 62% at 34% 26%, #6a747d 0%, #262c33 52%, #0c1014 100%);
+  border:3px solid rgba(255,255,255,.22);
+  box-shadow:
+    inset 0 3px 9px rgba(255,255,255,.3),
+    inset 0 -11px 20px rgba(0,0,0,.75),
+    0 6px 14px rgba(0,0,0,.55);
+  transition:opacity .25s ease, transform .35s var(--ease-pop), visibility .25s;
+}
+#hub.on{
+  opacity:1;visibility:visible;
+  transform:translate(-50%,-50%) scale(1);
+}
+#hubNum{
+  font-family:var(--font-board);font-weight:700;line-height:1;
+  font-size:64px;color:var(--cream);
+  text-shadow:0 3px 6px rgba(0,0,0,.85);
+  transition:color .25s ease;
+}
+#hub.pop{animation:hubPop .55s var(--ease-cam);}
+@keyframes hubPop{
+  0%  {transform:translate(-50%,-50%) scale(.4)}
+  55% {transform:translate(-50%,-50%) scale(1.18)}
+  100%{transform:translate(-50%,-50%) scale(1)}
+}
+
+/* ------------------------- BOTTOM CLUSTER ------------------------------- */
+/* Pinned to the bottom of the stage. Children are positioned from the bottom
+   edge using the reference offsets, so the whole cluster travels together
+   during the camera move. */
+#bottom{
+  position:absolute;left:0;right:0;bottom:0;height:528px;
+  transform-origin:50% 100%;
+  transition:transform var(--dur-cam) var(--ease-cam), opacity .45s ease-in-out;
+  will-change:transform,opacity;
+}
+
+#meters{
+  position:absolute;left:88px;width:508px;top:10px;
+  display:flex;justify-content:center;align-items:center;gap:12px;
+  font-size:20px;font-weight:800;letter-spacing:.06em;
+  color:var(--cream-dim);
+}
+#meters b{color:var(--gold);font-weight:900;letter-spacing:.01em;}
+#meters .sep{opacity:.5;}
+
+/* --------------------------- CAMERA STATES ------------------------------ */
+/* One class on #app drives the whole camera move, so nothing can desync. */
+#app.focus #wheelStage{transform:translateY(var(--zoomY)) scale(var(--zoomS));}
+#app.focus #bottom{transform:translateY(575px);opacity:0;pointer-events:none;}
+#app.focus #hist,
+#app.focus #menuBtn,
+#app.focus #zeroPays,
+#app.focus #limits,
+#app.focus #logo{opacity:.28;transition:opacity .5s ease;}
+#app.busy #board{pointer-events:none;}
+
+@media (prefers-reduced-motion:reduce){
+  #wheelStage,#bottom{transition-duration:1ms;}
+}
